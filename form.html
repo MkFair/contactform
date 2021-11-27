@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Обратная связь</title>
+  </head>
+  <body>
+    
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12 col-md-6 mx-auto">
+				<h4>Форма обратной связи</h4>
+				<form method=POST id="contact_form" enctype="multipart/form-data">
+					<div class="mb-3">
+						<label class="form-label">Ваше имя</label>
+						<input type=text name="name" class="form-control">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Ваш телефон</label>
+						<input type=text name="phone" class="form-control">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Ваш email</label>
+						<input type=email name="email" class="form-control">
+					</div>
+					<div class="mb-1">
+						<label class="form-label">Вложение</label>
+						<input type=file name="files[]" class="form-control">
+					</div>
+					<div class="mb-3">
+						<button type=button class="btn btn-success btn-sm" id="add_file_field">Добавить еще файл</button>
+					</div>
+					<button class="btn btn-primary">Отправить</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	
+	
+	
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js" integrity="sha512-eYSzo+20ajZMRsjxB6L7eyqo5kuXuS2+wEbbOkpaur+sA2shQameiJiWEzCIDwJqaB0a4a6tCuEvCOBHUg3Skg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script>
+		$("#add_file_field").click(function(e){
+			$($("input[name='files[]']").parent().eq(0).clone()).insertBefore($(this).parent())
+			$("input[name='files[]']").last().val("")
+		})
+		$("#contact_form").submit(function(e){
+			e.preventDefault();
+			$("#contact_form .alert").remove()
+			$.blockUI();
+			
+			var data = new FormData(this);
+			$.ajax({
+				url:"send.php",
+				method:"POST",
+				cache :false,
+				contentType  :false,
+				processData  :false,
+				data :data,
+				success:function(data){
+					$.unblockUI();
+					if(data["status"] == "ok"){
+						
+						$("#contact_form").prepend("<div class='alert alert-success'>Данные успешно отправлены</div>")
+					}else{
+						$("#contact_form").prepend("<div class='alert alert-danger'>Ошибка при отправке</div>")
+					}
+					
+				},
+				error:function(){
+					$.unblockUI();
+					alert("Произошла ошибка при отправке данных.");
+					
+				}
+			})
+		})
+		
+	</script>
+  </body>
+</html>
